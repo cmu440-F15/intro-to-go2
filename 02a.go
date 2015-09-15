@@ -15,21 +15,17 @@ func main() {
 
 	go func(done chan<- bool, lock_chan chan int) {
 		for i := 0; i < N_INCREMENTS; i++ {
-			_ = <-lock_chan 
-			fmt.Printf("GA %dgo\n", counter)
+			_ = <-lock_chan
 			counter++
-			fmt.Printf("GB %dgo\n", counter)
-			lock_chan <-1
+			lock_chan <- 1
 		}
 		done <- true
 	}(donechan, lock_chan)
 
 	for i := 0; i < N_INCREMENTS; i++ {
-		lock_chan <- 1
-		fmt.Printf("MB %dgo\n", counter)
-		counter++
-		fmt.Printf("MA %dgo\n", counter)
 		_ = <-lock_chan
+		counter++
+		lock_chan <- 1
 	}
 
 	_ = <-donechan
